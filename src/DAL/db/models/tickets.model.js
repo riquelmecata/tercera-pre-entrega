@@ -4,7 +4,7 @@ import { nanoid } from "nanoid";
 const TicketSchema = new mongoose.Schema({
     code: {
         type: String,
-        default: nanoid,
+        default: () => nanoid(),
         immutable: true,
         unique: true,
         required: true
