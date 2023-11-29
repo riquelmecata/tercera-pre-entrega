@@ -20,12 +20,18 @@ form.onsubmit = async (e) => {
 
     try {
         const { data } = await axios.post("http://localhost:8080/api/sessions/login", user);
+        console.log(data)
+        window.location.replace('http://localhost:8080/products')
+
+        /**
 
         if (data.adminRole && data.adminRole.toLowerCase() === 'admin') {
             window.location.replace('http://localhost:8080/profile');
         } else {
             window.location.replace('http://localhost:8080/products');
         }
+                 
+         */
         
         resetForm();
     } catch (error) {

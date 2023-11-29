@@ -1,4 +1,4 @@
-import { UserModel as User } from "../models/user.model.js"
+import { UserModel as User } from "../db/models/user.model.js"
 
 export default class UserManager {
     createUser = async (userPar) => {

@@ -1,16 +1,17 @@
 import express from "express";
 import __dirname from "./utils.js";
 import handlebars from "express-handlebars";
-import { router as ProductRouter,dbM } from "./routes/api/product.routes.js"
+import { router as ProductRouter } from "./routes/api/product.routes.js"
 import { router as CartRouter} from "./routes/api/carts.routes.js"
 import { router as viewsRouter } from "./routes/view.routes.js"
 import { router as sessionRouter } from "./routes/api/sessions.routes.js"
 import {Server} from "socket.io"
 import dotenv from "dotenv";
-import ProductManager from "./dao/mongomanagers/productManagerMongo.js";
+import ProductManager from "./DAL/dao/productManagerMongo.js";
 dotenv.config();
+import MessageManager from "./DAL/dao/messagesManager.js";
 
-import "./dao/dbConfig.js"
+import "./DAL/db/dbConfig.js"
 import "./passport/passport.config.js"
 
 import session  from "express-session";
@@ -23,6 +24,8 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(__dirname + "/public"))
 const fileStore= FileStore(session)
+const msgInstance = new MessageManager()
+
 app.use(session({
     store: new fileStore({
         path: __dirname+"/sessions"
@@ -57,65 +60,66 @@ const httpServer = app.listen(PORT, () => {
     console.log("Andando en puerto " + PORT)
 })
 
-//---------------------------------------Socket.io-----------------------------------//
-
 const socketServer = new Server(httpServer)
+let p = 0
 
-//-------------------------------Prueba conexión-------------------------------------------//
-socketServer.on("connection", socket => {
-    console.log("cliente conectado con id:" ,socket.id)
-//------Recibir información del cliente----------//
-    socket.on("message", data => {
-        console.log(data)
-    })
-//-----------------------------------------------//
-
-socket.on('addProduct',  data => {
-    pmanager.addProduct(data);
-    socketServer.emit("success", "Producto Agregado Correctamente");
-  });
-
-  socket.on("deleteProduct", (id) => {
-    pmanager.deleteProduct(id);
-    socketServer.emit("success", "Producto Eliminado Correctamente");
-  });
-  
-  socket.on("updateProduct", ({id, newProduct}) => {
-    pmanager.updateProduct(id, updatedProducts)
-    socketServer.emit("success", "Producto Actualizado Correctamente");
+const sessionMiddleware = session({
+    store: new fileStore({
+        path: __dirname + "/sessions"
+    }),
+    secret: "default",
 });
-  /*
 
-    socket.on("newProd", (newProduct) => {
-        products.addProduct(newProduct)
-        socketServer.emit("success", "Producto Agregado Correctamente");
+socketServer.use((socket, next) => {
+    sessionMiddleware(socket.request, {}, () => {
+        passport.initialize()(socket.request, {}, () => {
+            passport.session()(socket.request, {}, () => {
+                try {
+                    const user = socket.request.user; // Obtén el usuario de la sesión
+
+                    if (user && user.adminRole === "user") {
+                        // Si el usuario tiene el rol de "admin", permite la conexión
+                        return next();
+                    } else {
+                        // Si el usuario no tiene el rol adecuado, devuelve un error
+                        throw new Error("Unauthorized");
+                    }
+                } catch (error) {
+                    return next(error);
+                }
+            });
+        });
     });
-    socket.on("updProd", ({id, newProduct}) => {
-        products.updateProduct(id, newProduct)
-        socketServer.emit("success", "Producto Actualizado Correctamente");
-    });
-    socket.on("delProd", (id) => {
-        products.deleteProduct(id)
-        socketServer.emit("success", "Producto Eliminado Correctamente");
-    });
-*/
-    socket.on("newEmail", async({email, comment}) => {
-        let result = await transport.sendMail({
-            from:'Chat Correo <riquelmecata@gmail.com>',
-            to:email,
-            subject:'Correo con Socket y Nodemailer',
-            html:`
-            <div>
-                <h1>${comment}</h1>
-            </div>
-            `,
-            attachments:[]
-        })
-        socketServer.emit("success", "Correo enviado correctamente");
-    });
-//-----------------------------Enviar información al cliente----------------------------------//
-    socket.emit("test","mensaje desde servidor a cliente, se valida en consola de navegador")
-//--------------------------------------------------------------------------------------------//
+});
+
+
+socketServer.on('connection', async (socket) => {
+    p += 1
+    console.log(`${p} connected`)
+    console.log(socket.request.user.email)
+
+    const msgs = await msgInstance.getMsgs()
+
+    socket.emit('messages', msgs)
+
+    socket.on('newMsg', async obj => {
+        console.log("Entro a agregar");
+        try {
+
+            await msgInstance.newMsg({ ...obj, user: socket.request.user.email })
+            const updateMsg = await msgInstance.getMsgs()
+            socketServer.emit('messages', updateMsg)
+        } catch (error) {
+            return
+        }
+    })
+
+    socket.on('disconnect', (msg) => {
+        p -= 1
+        console.log(`${p} connected`)
+        console.log(msg);
+    })
+
 })
 
 httpServer

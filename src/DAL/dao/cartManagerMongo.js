@@ -1,6 +1,6 @@
 import fs from "fs"
-import { ProductsModel } from "../models/products.model.js"
-import { CartModel } from "../models/carts.model.js"
+import { ProductsModel } from "../db/models/products.model.js"
+import { CartModel } from "../db/models/carts.model.js"
 
 
 export default class CartManagerDB {

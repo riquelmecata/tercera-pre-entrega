@@ -3,9 +3,12 @@ import bcrypt from "bcrypt"
 import { Strategy as GitHubStrategy } from "passport-github2";
 
 import { Strategy as LocalStrategy } from "passport-local";
-import { UserModel } from "../dao/models/user.model.js";
-import { dbM}  from "../routes/api/sessions.routes.js";
+import { UserModel } from "../DAL/db/models/user.model.js";
+import { dbM}  from "../controller/sessions.controller.js";
 let encryptRounds = 1
+
+import { emailSender } from "../mailer/mailer.js"
+import { confirmEmailTemplate } from "../mailer/templates/confirmRegister.js"
 
 
 passport.use("login", new LocalStrategy({
@@ -56,7 +59,8 @@ passport.use('signup', new LocalStrategy(
                 obj.password = bcrypt.hashSync(password, encryptRounds);
                 let newUser = await dbM.createUser(obj)
                 if (!newUser.success) done({ error: "No se pudo crear el usuario" }, false)
-                done(null, newUser.success)
+                await emailSender(newUser.success.email, "prueba", confirmEmailTemplate(newUser.success.first_name))
+                return done(null, newUser.success)
             } catch (e) {
                 done({ error: e.message }, false)
             }

@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { dbM as dbInstance } from './api/product.routes.js';
-import { dbM as dbCart } from './api/carts.routes.js';
+import { dbM as dbInstance } from '../controller/product.controller.js';
+import { dbM as dbCart } from '../controller/cart.controller.js';
+import { adminValidator, userValidator } from "../middlewares/auth.middleware.js"
 
 // Importar todos los routers;
 export const router = Router();
 
-router.get("/products", async (req, res) => {
+router.get("/products", userValidator, async (req, res) => {
     if(!req?.user?.email) return res.redirect("/login")
     try {
         const { limit, page, sort } = req.query
@@ -96,13 +97,14 @@ router.get("/profile", async (req, res) => {
     });
 })
 
-/*
-router.get('/admin',async(req, res) => {    
-    const prodAll = await pmanager.getProducts();
-    console.log(productos)
-    res.render('admin', { products: prodAll });
-    });
+router.get("/chat", async (req, res) => {
 
-    */
+    if (!req?.user?.email) return res.redirect("/login")
 
+    try {
 
+        res.render("chat")
+    } catch (e) {
+        res.send(500).json({ error: e.message })
+    }
+})

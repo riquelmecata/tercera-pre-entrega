@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import env from "../config/config.js";
+import env from "../../config/config.js";
 
 const { userDb, passwordDb } = env;
 

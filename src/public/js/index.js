@@ -6,7 +6,19 @@ const price = document.getElementById('price')
 const code = document.getElementById('code')
 const stock = document.getElementById('stock')
 const category = document.getElementById('category')
+const logout = document.getElementById('logout')
 
+logout.addEventListener('click',async (e) => {
+    try {
+       const {data}= await axios.delete("http://localhost:8080/api/sessions/logout/")
+       console.log(data)
+        alert(data.msg)
+        window.location.replace('http://localhost:8080/login')
+
+    } catch (error) {
+        alert(error.message)
+    }
+})
 
 
 
