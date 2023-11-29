@@ -1,0 +1,17 @@
+<div class="container text-center">
+    <ul class="nav justify-content-center">
+        <li class="nav-item my-2">
+            <a class="btn btn-outline-dark" href="http://localhost:8080/products?page=1&limit=10">Productos</a>
+        </li>
+        <li class="nav-item my-2 mx-2">
+            <a class="btn btn-outline-dark" href="http://localhost:8080/carts/651cd552fef520effdaae934">Carrito</a>
+        </li>
+    </ul>
+</div>
+
+<h1>Perfil de usuario</h1>
+<h3><a href="/api/sessions/logout">Cerrar sesión</a></h3>
+<p>Nombre: {{first_name}} {{last_name}}</p>
+<p>email: {{email}}</p>
+<p>edad: {{age}}</p>
+<p>Rol: {{adminRole}}</p>
