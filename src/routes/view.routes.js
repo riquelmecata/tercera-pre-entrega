@@ -81,7 +81,7 @@ router.get("/register", async (req, res) => {
 
 
 /** esto funciona */
-router.get("/profile", async (req, res) => { 
+router.get("/profile", adminValidator, async (req, res) => { 
     if(!req?.user?.email)
     {
         return res.redirect("/login")
