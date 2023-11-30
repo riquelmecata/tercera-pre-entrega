@@ -8,20 +8,17 @@ export const loginController= async (req, res) => {
     res.status(200).json({ result: true })
 }
 
-export const logoutController= async  (req, res) => {
-
+export const logoutController = async (req, res) => {
     try {
         req.session.destroy(() => {
-            req.logout((err)=>console.log(err))  
-            res.status(200).json({ success: true, msg: "Session finalizada" })
-
-        })
+            req.logout((err) => console.log(err));
+            res.status(200).json({ success: true  });
+        }); 
     } catch (error) {
-        console.log(error)
-        res.status(400).json({ success: false, error: error.message })
-
+        console.log(error);
+        res.status(400).json({ success: false, error: error.message });
     }
-}
+};
 
 export const signUpController= async (req, res) => {
 

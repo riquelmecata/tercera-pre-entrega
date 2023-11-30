@@ -59,7 +59,7 @@ passport.use('signup', new LocalStrategy(
                 obj.password = bcrypt.hashSync(password, encryptRounds);
                 let newUser = await dbM.createUser(obj)
                 if (!newUser.success) done({ error: "No se pudo crear el usuario" }, false)
-                await emailSender(newUser.success.email, "prueba", confirmEmailTemplate(newUser.success.first_name))
+                await emailSender(newUser.success.email, "Prueba", confirmEmailTemplate(newUser.success.first_name))
                 return done(null, newUser.success)
             } catch (e) {
                 done({ error: e.message }, false)

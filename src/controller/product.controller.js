@@ -39,7 +39,7 @@ export const getOneProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
     const { title, description, code, price,
-        status, stock, category, thumbnails } = req.body
+        status, stock, category, thumbnail } = req.body
     if ([title, description, code, price, stock, category].includes(undefined)) return res.status(400).json({ error: "Faltan campos obligatorios" })
     try {
         let obj = {}
@@ -51,10 +51,10 @@ export const createProduct = async (req, res) => {
         obj.status = Boolean(status ? status : true)
         obj.stock = parseInt(stock)
         obj.category = category.toString()
-        obj.thumbnails = thumbnails ? thumbnails : []
-        if (thumbnails && Array.isArray(thumbnails)) {
-            for (let i = 0; i < thumbnails.length; i++) {
-                obj.thumbnails[i] = thumbnails[i].toString();
+        obj.thumbnail = thumbnail ? thumbnail : []
+        if (thumbnail && Array.isArray(thumbnail)) {
+            for (let i = 0; i < thumbnail.length; i++) {
+                obj.thumbnail[i] = thumbnail[i].toString();
 
             }
         }
@@ -87,14 +87,11 @@ export const productUpdater = async (req, res) => {
             if (objeChanges.stock) objeChanges.stock = parseInt(objeChanges.stock)
             if (objeChanges.category) objeChanges.category = objeChanges.category.toString()
             if (objeChanges.category) objeChanges.category = objeChanges.category.toString()
-            if (objeChanges.thumbnails) {
-                if (Array.isArray(objeChanges.thumbnails)) {
-                    for (let i = 0; i < objeChanges.thumbnails.length; i++) {
-                        objeChanges.thumbnails[i] = objeChanges.thumbnails[i].toString();
+            if (objeChanges.thumbnail) objeChanges.thumbnail = objeChanges.thumbnail.toString();
 
-                    }
-                }
-            }
+                    
+                
+            
 
 
             let arrProduct = await dbM.updateProduct(pid, objeChanges)

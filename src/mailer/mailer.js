@@ -19,12 +19,6 @@ export const emailSender = async (mailTo, subjectStr, htmlFunc) => {
             to: mailTo, // list of receivers
             subject: subjectStr, // Subject line
             html: htmlFunc, // html body
-            dsn: {
-                id: 'some random message specific id',
-                return: 'headers',
-                notify: ['failure', 'delay'],
-                recipient: `riquelmecata@gmail.com`
-            }
         });
 
         return { success: true }
@@ -37,5 +31,3 @@ export const emailSender = async (mailTo, subjectStr, htmlFunc) => {
 
 
 }
-
-transport.verify().then(() => console.log("ready for send email"))

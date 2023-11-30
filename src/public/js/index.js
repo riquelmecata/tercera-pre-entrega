@@ -12,7 +12,6 @@ logout.addEventListener('click',async (e) => {
     try {
        const {data}= await axios.delete("http://localhost:8080/api/sessions/logout/")
        console.log(data)
-        alert(data.msg)
         window.location.replace('http://localhost:8080/login')
 
     } catch (error) {
